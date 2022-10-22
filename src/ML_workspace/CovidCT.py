@@ -13,7 +13,7 @@ class CovidCT(object):
     def Predict(self):
         """
         """
-        # print(self.IMAGE.text)
+
         result = random.choice([True, False])
         return result
 

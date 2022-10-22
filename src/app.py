@@ -10,10 +10,13 @@ import config
 from flask_socketio import SocketIO
 from flask_cors import CORS
 
+from flask_ngrok import run_with_ngrok
+
 
 def create_app():
 
     app = Flask(__name__)
+    # run_with_ngrok(app)
 
     # Establish connection to MongoDB Cluster
     try:
@@ -48,4 +51,4 @@ if __name__ == '__main__':
     # Use 'waitress' or 'gunicorn' WSGI for production instead
 
     print("goin")
-    app = create_app().run(debug=True)
+    app = create_app().run(host="0.0.0.0")

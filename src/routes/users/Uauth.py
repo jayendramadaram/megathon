@@ -27,14 +27,8 @@ def signup():
 
         UniqueNum = Uhash(MobileNum)
 
-        # user_obj = db.users.find_one({"_id": UniqueNum})
-
-        # if user_obj != None:
-        #     return make_response(
-        #         jsonify(user_exists=True,
-        #                 message="MobileNum already taken"), 409)
-        if not SetOTP(MobileNum):
-            return make_response(jsonify(error="Ivalid Number to send OTP"), 400)
+        SetOTP(MobileNum)
+        # return make_response(jsonify(error="Ivalid Number to send OTP"), 400)
         return make_response(jsonify(success=True), 200)
     except Exception as e:
         print(e,  e.__traceback__.tb_lineno)
@@ -48,14 +42,20 @@ def ValidateSingnup():
         if not request or not request.json:
             return make_response(jsonify(error="Requirements Missing REQUIRED"), 400)
         req = dict(request.json)
+
         MobileNum = req.get("MobileNum")
         OTP = int(req.get("OTP"))
         FirstName = req.get("FirstName")
         address = req.get("addr")
-        if not MobileNum or not FirstName or not address or not OTP:
+        Age = req.get("age")
+        gender = req.get("gender")
+
+        if not MobileNum or not FirstName or not address or not OTP or not Age or not gender:
             return make_response(jsonify(error="Requirements Missing REQUIRED"), 400)
         r = redis.Redis(host='localhost', port=6379, db=0)
         rOTP = int(r.get(MobileNum))
+        if not rOTP:
+            return make_response(jsonify(error="No user Registered"), 400)
         if OTP != rOTP:
             return make_response(jsonify(error="Wrong OTP"), 400)
         UniqueNum = Uhash(MobileNum)
@@ -64,6 +64,8 @@ def ValidateSingnup():
             "FirstName": FirstName,
             "address": address,
             "MobileNum": MobileNum,
+            "age": Age,
+            "gender": gender,
             "Services": {
                 "CovidXray": [],
                 "CovidCT": [],
@@ -100,7 +102,7 @@ def ValidateSingnin():
         token = jwt.encode({
             'public_id': useOBJ["_id"],
             'exp': datetime.utcnow() + timedelta(weeks=2)
-        }, config.SECRET_KEY)
+        }, config.SECRET_KEY).decode('utf-8')
         return make_response(jsonify(success=True, token=str(token)), 200)
 
     except Exception as e:

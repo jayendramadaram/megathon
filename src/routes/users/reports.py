@@ -13,8 +13,8 @@ from ML_workspace import model, CovidCT, CovidXray, Tuber
 # from Logic_objects import file_server
 from flask import Blueprint, request, make_response, jsonify
 
-from routes.users import token_required
-from routes import API_required
+# from routes.users import token_required
+from routes import API_required, token_required
 
 
 file = Blueprint('file', __name__)
@@ -52,7 +52,7 @@ def new_CovidCT(current_user):
                 "$set": {"Services": current_user["Services"]}
             })
 
-            return make_response(jsonify(success=True), 200)
+            return make_response(jsonify(success=True, result=response), 200)
         else:
             return make_response(jsonify(error="Improper Image ID"), 400)
     except Exception as e:
@@ -89,7 +89,7 @@ def new_CovidXray(current_user):
                 "$set": {"Services": current_user["Services"]}
             })
 
-            return make_response(jsonify(success=True), 200)
+            return make_response(jsonify(success=True, result=response), 200)
         else:
             return make_response(jsonify(error="Improper Image ID"), 400)
         return make_response(jsonify(success=True), 200)
@@ -128,7 +128,7 @@ def new_Tuber(current_user):
                 "$set": {"Services": current_user["Services"]}
             })
 
-            return make_response(jsonify(success=True), 200)
+            return make_response(jsonify(success=True, result=response), 200)
         else:
             return make_response(jsonify(error="Improper Image ID"), 400)
         return make_response(jsonify(success=True), 200)
@@ -152,7 +152,7 @@ def getCases(current_user):
         Type = resp.get("Type")
         if Type not in ["CovidXray", "CovidCT", "Tuber"]:
             return make_response(jsonify(error="Impropr TYPE"), 400)
-        return current_user["Services"][Type]
+        return make_response(jsonify(success=True, result=current_user["Services"][Type]), 200)
     except Exception as e:
         print(e,  e.__traceback__.tb_lineno)
         return make_response(jsonify(uploaded="fail", file_id=None, error=e), 403)

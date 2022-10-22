@@ -1,3 +1,5 @@
+import jwt
+from config import db
 from twilio.rest import Client
 import random
 import redis
@@ -6,6 +8,8 @@ import config
 from flask import jsonify, make_response, request
 from hashlib import sha256
 from argon2 import PasswordHasher
+import requests
+import json
 
 
 def API_required(f):
@@ -64,3 +68,45 @@ def SetOTP(MobileNum: str):
     if resp.status_code != 200:
         return False
     return True
+
+
+# Decorators
+
+
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+
+        token = None
+
+        # jwt is passed in the request header
+        if 'x-access-token' in request.headers:
+            token = request.headers['x-access-token']
+        if not token:
+            return make_response(jsonify({'message': 'Token is missing !!'}), 400)
+
+        # jwt validation
+        try:
+            try:
+                print(token, "this is jwt", token.split("\'")[1])
+                data = jwt.decode(
+                    token.split("\'")[1], config.SECRET_KEY, algorithms=["HS256"])
+            except Exception as e:
+                print(e, "this is EXCEP")
+                return make_response(jsonify({
+                    'message': 'Token invalid or tampered!! Access denied'
+                }), 401)
+            current_user = db.users.find_one({"_id": data["public_id"]})
+            if not current_user:
+                return make_response(jsonify({
+                    'message': 'unable to find user '
+                }), 404)
+        except Exception as e:
+            print(e,  e.__traceback__.tb_lineno)
+            return make_response(jsonify({
+                'message': 'unable to find user or token tampered!'
+            }), 400)
+
+        # returns the current logged in users context to the routes
+        return f(current_user, *args, **kwargs)
+    return decorated
