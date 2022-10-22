@@ -1,6 +1,7 @@
 # import pymongo
 # import threading
 # import socket
+import redis
 from datetime import datetime
 import json
 # from xmlrpc.client import Server
@@ -85,11 +86,15 @@ url = ["http://127.0.0.1:3000/upload_Data",
 #     for insert_change in stream:
 #         print(insert_change)
 #         resume_token = stream.resume_token
+
 resp = requests.post("http://127.0.0.1:5000/signup", headers={
-    "X-API-Key": "pleaseWorkHoney"
+    "X-API-Key": "pleaseWorkHoney",
+    "x-access-token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJwdWJsaWNfaWQiOiI1M2MyMGFmNmFkNWE0MjQyNGJjYjI3OGY5MDA0OTQ1YTdhNzUxODMzNDJjZGVkNTJkNzRiYWQ5MGQ0OGRkZGQyIiwiZXhwIjoxNjY3Njc2NjQ3fQ.FdvlL8kvltE9stVQwKiv4CWaYyxxw7O30hVFga9bN4M"
 }, json={
-    "MobileNum": "wedcwedc",
-    "FirstName": "sefcscf",
-    "addr": "addr"
+    "ImgID": "7b4c4583-4073-4d49-942f-91bcaf275fcb",
+    "MobileNum": "9100572308",
+    "OTP": 54916,
+    "FirstName": "Sravan MAMA",
+    "addr": "lalapet"
 })
 print(resp.text)

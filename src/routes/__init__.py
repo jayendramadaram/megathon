@@ -1,3 +1,4 @@
+from twilio.rest import Client
 import random
 import redis
 from functools import wraps
@@ -48,6 +49,18 @@ def verifyPass(hash, password):
 def SetOTP(MobileNum: str):
     r = redis.Redis(host='localhost', port=6379, db=0)
     # print(r.set("A", "a"))
-    r.set(MobileNum, random.randint(10000, 100000))
+    OTP = random.randint(10000, 100000)
+    r.set(MobileNum, OTP)
     r.expire(MobileNum, 600)
-    # print(r.get(MobileNum))
+    resp = requests.post(
+        "https://sms.api.sinch.com/xms/v1/3b8ae4caffbd43d99d7868e146af7d7a/batches", headers={
+            "Authorization": "Bearer 21d042c387334abdb8555ecc83c36faa",
+            "Content-Type": "application/json"
+        }, data=json.dumps({
+            "from": "447520651139",
+            "to": [f"91{MobileNum}"],
+            "body": f"Macha here is your OTP {OTP}"
+        }))
+    if resp.status_code != 200:
+        return False
+    return True

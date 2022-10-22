@@ -4,15 +4,18 @@ import random
 
 class Tuber(object):
     def __init__(self, ImgID: str) -> None:
-        print("success")
         self.ImgID = ImgID
-        self.IMAGE = requests.get(f"replti:{self.ImgID}")
+        print(
+            f"https://storage.jayendramadara.repl.co/download?id={self.ImgID}")
+        self.IMAGE = requests.get(
+            f"https://storage.jayendramadara.repl.co/download?id={self.ImgID}")
 
-    def Predict():
+    def Predict(self):
         """
         """
+        # print(self.IMAGE.text)
         result = random.choice([True, False])
         return result
 
     def __repr__(self) -> str:
-        return "ALL SET"
+        return "True" if self.IMAGE.status_code else "False"

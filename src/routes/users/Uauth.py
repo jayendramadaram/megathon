@@ -27,13 +27,14 @@ def signup():
 
         UniqueNum = Uhash(MobileNum)
 
-        user_obj = db.users.find_one({"_id": UniqueNum})
+        # user_obj = db.users.find_one({"_id": UniqueNum})
 
-        if user_obj != None:
-            return make_response(
-                jsonify(user_exists=True,
-                        message="MobileNum already taken"), 409)
-        resp = SetOTP(MobileNum)
+        # if user_obj != None:
+        #     return make_response(
+        #         jsonify(user_exists=True,
+        #                 message="MobileNum already taken"), 409)
+        if not SetOTP(MobileNum):
+            return make_response(jsonify(error="Ivalid Number to send OTP"), 400)
         return make_response(jsonify(success=True), 200)
     except Exception as e:
         print(e,  e.__traceback__.tb_lineno)
@@ -100,7 +101,7 @@ def ValidateSingnin():
             'public_id': useOBJ["_id"],
             'exp': datetime.utcnow() + timedelta(weeks=2)
         }, config.SECRET_KEY)
-        return make_response(jsonify(success=True, token=token), 200)
+        return make_response(jsonify(success=True, token=str(token)), 200)
 
     except Exception as e:
         print(e,  e.__traceback__.tb_lineno)
